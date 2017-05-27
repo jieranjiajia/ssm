@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans" 
+xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+xsi:schemaLocation="http://www.springframework.org/schema/beans 
+					http://www.springframework.org/schema/beans/spring-beans-4.0.xsd">
+
+
+		<!-- 第一步配置sqlSessionFactoryBean -->
+		<bean id="sqlSessionFactory" class="org.mybatis.spring.SqlSessionFactoryBean">
+			<property name="dataSource" ref="dataSource"></property>
+			<!-- 指定mybatis的配置文件的位置 -->
+			<property name="configLocation" value="classpath:conf/mybatis.xml"></property>
+			<!-- 指定别名文件的  -->
+			<property name="typeAliasesPackage" value="org.study.model"></property>
+			<property name="mapperLocations" value="classpath:xmlMapper/*.xml"></property>
+			
+			<!-- 配置插件 -->
+		</bean>				
+	
+		<!-- 
+			扫描mapper接口，进行代理操作
+			注意：此处有一个非常大的坑，配置sqlSessionFactory时要用sqlSessionFactoryBeanName来配置
+			若用sqlSessionFactory这个属性加ref来配置会报NumberFormatException
+		 -->
+		<bean id="scanner" class="org.mybatis.spring.mapper.MapperScannerConfigurer">
+			<property name="sqlSessionFactoryBeanName" value="sqlSessionFactory"></property>
+			<property name="basePackage" value="org.study.mapper"></property>
+		</bean>
+		
+</beans>
