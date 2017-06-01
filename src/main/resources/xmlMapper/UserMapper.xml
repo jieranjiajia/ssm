@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="UTF-8" ?>  
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.oqs.mapper.UserMapper">
+
+	<resultMap id="BaseResultMap" type="User">
+		<id column="ID" property="id" />
+		<result column="SALT" property="salt" />
+		<result column="LOGIN_NAME" property="loginName" />
+		<result column="PASSWORD" property="password" />
+		<result column="EMAIL" property="email"/>
+		<result column="CREATE_TIME" property="createTime" jdbcType="TIMESTAMP" />
+		<result column="STATUS" property="status" />
+	</resultMap>
+	
+	<resultMap id="UserRoleMap" type="User" extends="BaseResultMap">
+		<collection property="roles" ofType="Role">
+			<id column="roleid" property="id"></id>
+			<result column="rolename" property="name"></result>
+		</collection>
+	</resultMap>
+	
+	<!-- 单表的所有列 -->	
+	<sql id="Base_Column_List">
+		id, 
+		salt,
+		login_name,
+		password,
+		email,
+		create_time,
+		status
+	</sql>
+
+	<select id="selectAll" resultMap="BaseResultMap">
+		select
+		<include refid="Base_Column_List" />
+		from user
+	</select>
+
+	<select id="getUserById" resultMap="BaseResultMap"	parameterType="Integer">
+		select
+		<include refid="Base_Column_List" />
+		from user
+		where id = #{id}
+	</select>
+
+	
+
+	<select id="getUserByRecord" resultMap="UserRoleMap" parameterType="User">
+		select <include refid="Base_Column_List"/>,
+		R.ROLE_ID,
+		R.ROLE_NAME
+		from user U
+		inner join USER_ROLE UR ON UR.USER_ID = ID
+		inner join ROLE R ON R.ROLE_ID = UR.ROLE_ID
+		<where>
+			<if test="loginName != null and loginName !=''">
+				username = #{username}
+			</if>
+			<if test="password != null and password != ''">
+				and password = #{password}
+			</if>
+			<if test="email != null and email != ''">
+				and email = #{email}
+			</if>
+		</where>
+	</select>
+
+	
+
+	<insert id="insertUser" parameterType="User">
+		insert into user ( 
+		  salt
+		, login_name
+		, password
+		, email
+		  status)
+		values ( 
+		  #{salt}
+		, #{loginName}
+		, #{password}
+		, #{email}
+		, #{status})
+	</insert>
+
+	
+
+</mapper> 
